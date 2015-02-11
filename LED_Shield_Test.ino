@@ -22,7 +22,6 @@ void setup() {
 }
 
 void loop(void){
-  /*
   slowScanRows();
   rasterize();  
   renderRandomImage();
@@ -30,9 +29,8 @@ void loop(void){
   renderDownRightSlash();
   renderBarGraph();
   renderAllOn();
-  */
   scrollFonts();
-  
+  scrollRandom(); 
 }
 
 void setRowColValues(uint8_t row, uint8_t col){
@@ -162,7 +160,7 @@ void renderImage(uint8_t image[8], uint16_t display_duration){
 
 // a font set borrowed/adapted from 
 // http://www.instructables.com/id/LED-Scolling-Dot-Matrix-Font-Graphics-Generator-/step6/Predefined-5x8-Font-Data-and-Awesome-Patterns/
-const uint8_t font[] PROGMEM = {
+const uint8_t font[] = {
   0x7F, 0x88, 0x88, 0x88, 0x7F, //  A
   0xFF, 0x91, 0x91, 0x91, 0x6E, //  B
   0x7E, 0x81, 0x81, 0x81, 0x42, //  C
@@ -247,10 +245,39 @@ void scrollFonts(){
   uint8_t fontImage[8] = {0};
   uint8_t displayImage[8] = {0};
   
-  const uint16_t scrollLag = 100;
+  const uint16_t scrollLag = 90;
   
-  for(uint8_t fontIndex = 0; fontIndex < 52; fontIndex++){
+  for(uint8_t fontIndex = 0; fontIndex < 52 + 25; fontIndex++){
     getFontImage(fontIndex, fontImage);  
+    for(uint8_t columnNumber = 0; columnNumber < 5; columnNumber++){
+      slideDisplayLeft(displayImage);                  
+      addSliceToDisplay(fontImage, columnNumber, displayImage);      
+      renderImage(displayImage, scrollLag);  
+    }
+    slideDisplayLeft(displayImage);   
+    renderImage(displayImage, scrollLag);
+  }
+  
+  // scroll out the last font
+  for(uint8_t ii = 0; ii < 8; ii++){
+    slideDisplayLeft(displayImage);
+    renderImage(displayImage, scrollLag);
+  }     
+    
+}
+
+void scrollRandom(void){
+  uint8_t fontImage[8] = {0};
+  uint8_t displayImage[8] = {0};
+  
+  const uint16_t scrollLag = 90;
+  
+  for(uint8_t fontIndex = 0; fontIndex < 20; fontIndex++){
+    // generate random image
+    for(uint8_t ii = 0; ii < 8; ii++){
+      fontImage[ii] = random() % 256; 
+    }
+    
     for(uint8_t columnNumber = 0; columnNumber < 5; columnNumber++){
       slideDisplayLeft(displayImage);                  
       addSliceToDisplay(fontImage, columnNumber, displayImage);      
@@ -263,33 +290,20 @@ void scrollFonts(){
   for(uint8_t ii = 0; ii < 8; ii++){
     slideDisplayLeft(displayImage);
     renderImage(displayImage, scrollLag);
-  }     
-    
+  }    
 }
 
 void getFontImage(uint8_t fontIndex, uint8_t * fontImage){
     memset(fontImage, 0, 8);
     // transpose and rotate the font  
     for(uint8_t columnNumber = 0; columnNumber < 5; columnNumber++){
-      uint8_t columnBits =  pgm_read_byte(&(font[fontIndex*5 + columnNumber]));
+      uint8_t columnBits =  font[fontIndex*5 + columnNumber];
       for(uint8_t rowNumber = 0; rowNumber < 8; rowNumber++){      
         if(columnBits & _BV(rowNumber)){                 // if the row is set in this column
           fontImage[7-rowNumber] |= _BV(7-columnNumber); // set the column in this row of the transposed image
         }
       }
     } 
-    
-    for(uint8_t row = 0; row < 8; row++){
-      for(int8_t col = 7; col >= 0; col--){
-        if(fontImage[row] & _BV(col)){
-          Serial.print("1 ");
-        }
-        else{
-          Serial.print("  ");
-        }
-      } 
-      Serial.println(); 
-    }
 }
 
 void slideDisplayLeft(uint8_t * displayImage){
