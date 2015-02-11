@@ -31,6 +31,7 @@ void loop(void){
   renderAllOn();
   scrollFonts();
   scrollRandom(); 
+  scrollText("Wicked Device Changing the world 8 bits at a time~");
 }
 
 void setRowColValues(uint8_t row, uint8_t col){
@@ -157,11 +158,37 @@ void renderImage(uint8_t image[8], uint16_t display_duration){
   }
 }
 
+void scrollRandom(void){
+  uint8_t fontImage[8] = {0};
+  uint8_t displayImage[8] = {0};
+  
+  const uint16_t scrollLag = 90;
+  
+  for(uint8_t fontIndex = 0; fontIndex < 20; fontIndex++){
+    // generate random image
+    for(uint8_t ii = 0; ii < 8; ii++){
+      fontImage[ii] = random() % 256; 
+    }
+    
+    for(uint8_t columnNumber = 0; columnNumber < 5; columnNumber++){
+      slideDisplayLeft(displayImage);                  
+      addSliceToDisplay(fontImage, columnNumber, displayImage);      
+      renderImage(displayImage, scrollLag);  
+    }
+    slideDisplayLeft(displayImage);   
+    renderImage(displayImage, scrollLag);
+  }
+  
+  for(uint8_t ii = 0; ii < 8; ii++){
+    slideDisplayLeft(displayImage);
+    renderImage(displayImage, scrollLag);
+  }    
+}
 
 // a font set borrowed/adapted from 
 // http://www.instructables.com/id/LED-Scolling-Dot-Matrix-Font-Graphics-Generator-/step6/Predefined-5x8-Font-Data-and-Awesome-Patterns/
 const uint8_t font[] = {
-  0x7F, 0x88, 0x88, 0x88, 0x7F, //  A
+  0x7F, 0x88, 0x88, 0x88, 0x7F, //  A [0]
   0xFF, 0x91, 0x91, 0x91, 0x6E, //  B
   0x7E, 0x81, 0x81, 0x81, 0x42, //  C
   0xFF, 0x81, 0x81, 0x42, 0x3C, //  D
@@ -187,7 +214,7 @@ const uint8_t font[] = {
   0xC3, 0x24, 0x18, 0x24, 0xC3, //  X
   0xE0, 0x10, 0x0F, 0x10, 0xE0, //  Y
   0x83, 0x85, 0x99, 0xA1, 0xC1, //  Z
-  0x06, 0x29, 0x29, 0x29, 0x1F, //  a
+  0x06, 0x29, 0x29, 0x29, 0x1F, //  a [26]
   0xFF, 0x09, 0x11, 0x11, 0x0E, //  b
   0x1E, 0x21, 0x21, 0x21, 0x12, //  c
   0x0E, 0x11, 0x11, 0x09, 0xFF, //  d
@@ -213,7 +240,8 @@ const uint8_t font[] = {
   0x11, 0x0A, 0x04, 0x0A, 0x11, //  x
   0x00, 0x39, 0x05, 0x05, 0x3E, //  y
   0x11, 0x13, 0x15, 0x19, 0x11, //  z
-  0x00, 0x41, 0xFF, 0x01, 0x00, //  1
+  0x7E, 0x89, 0x91, 0xA1, 0x7E, //  0 [52]  
+  0x00, 0x41, 0xFF, 0x01, 0x00, //  1 
   0x43, 0x85, 0x89, 0x91, 0x61, //  2
   0x42, 0x81, 0x91, 0x91, 0x6E, //  3
   0x18, 0x28, 0x48, 0xFF, 0x08, //  4
@@ -222,22 +250,22 @@ const uint8_t font[] = {
   0x80, 0x8F, 0x90, 0xA0, 0xC0, //  7
   0x6E, 0x91, 0x91, 0x91, 0x6E, //  8
   0x70, 0x89, 0x89, 0x8A, 0x7C, //  9
-  0x60, 0x80, 0x8D, 0x90, 0x60, //  ?
-  0x00, 0x00, 0xFD, 0x00, 0x00, //  !
-  0x7E, 0x89, 0x91, 0xA1, 0x7E, //  0
-  0x66, 0x89, 0x8F, 0x81, 0x7E, //  @
-  0x24, 0xFF, 0x24, 0xFF, 0x24, //  #
-  0x76, 0x89, 0x95, 0x62, 0x05, //  &
-  0x00, 0x3C, 0x42, 0x81, 0x00, //  (
-  0x00, 0x81, 0x42, 0x3C, 0x00, //  )
-  0x08, 0x08, 0x3E, 0x08, 0x08, //  "+"
-  0x08, 0x08, 0x08, 0x08, 0x08, //  -
-  0x14, 0x14, 0x14, 0x14, 0x14, //  =
-  0x10, 0x10, 0x54, 0x38, 0x10, //  R arrow
-  0x08, 0x1C, 0x2A, 0x08, 0x08, //  L arrow
-  0x12, 0x2A, 0x7F, 0x2A, 0x24, //  $
-  0x44, 0x02, 0x12, 0x02, 0x44, //  smile
-  0xFF, 0xFF, 0xFF, 0xFF, 0xFF, //  5x8 block  
+  0x60, 0x80, 0x8D, 0x90, 0x60, //  ? [62]
+  0x00, 0x00, 0xFD, 0x00, 0x00, //  ! [63]
+  0x66, 0x89, 0x8F, 0x81, 0x7E, //  @ [64]
+  0x24, 0xFF, 0x24, 0xFF, 0x24, //  # [65]
+  0x76, 0x89, 0x95, 0x62, 0x05, //  & [66]
+  0x00, 0x3C, 0x42, 0x81, 0x00, //  ( [67]
+  0x00, 0x81, 0x42, 0x3C, 0x00, //  ) [68]
+  0x08, 0x08, 0x3E, 0x08, 0x08, //  + [69]
+  0x08, 0x08, 0x08, 0x08, 0x08, //  - [70]
+  0x14, 0x14, 0x14, 0x14, 0x14, //  = [71]
+  0x10, 0x10, 0x54, 0x38, 0x10, //  R arrow   [72]
+  0x08, 0x1C, 0x2A, 0x08, 0x08, //  L arrow   [73]
+  0x12, 0x2A, 0x7F, 0x2A, 0x24, //  $         [74]
+  0x44, 0x02, 0x12, 0x02, 0x44, //  smile     [75]
+  0x00, 0x00, 0x00, 0x00, 0x00, //  space     [76
+  0xFF, 0xFF, 0xFF, 0xFF, 0xFF, //  5x8 block [77] 
 };
 
 void scrollFonts(){
@@ -266,18 +294,21 @@ void scrollFonts(){
     
 }
 
-void scrollRandom(void){
+void scrollText(const char * text){
+
   uint8_t fontImage[8] = {0};
   uint8_t displayImage[8] = {0};
+  uint16_t textLength = strlen(text);
   
-  const uint16_t scrollLag = 90;
+  const uint16_t scrollLag = 70;
   
-  for(uint8_t fontIndex = 0; fontIndex < 20; fontIndex++){
-    // generate random image
-    for(uint8_t ii = 0; ii < 8; ii++){
-      fontImage[ii] = random() % 256; 
-    }
+  for(uint16_t textIndex = 0; textIndex < textLength; textIndex++){
     
+    // get font index from character value
+    uint8_t fontIndex = getfontIndex(text[textIndex]);
+        
+    
+    getFontImage(fontIndex, fontImage);  
     for(uint8_t columnNumber = 0; columnNumber < 5; columnNumber++){
       slideDisplayLeft(displayImage);                  
       addSliceToDisplay(fontImage, columnNumber, displayImage);      
@@ -287,10 +318,78 @@ void scrollRandom(void){
     renderImage(displayImage, scrollLag);
   }
   
+  // scroll out the last font
   for(uint8_t ii = 0; ii < 8; ii++){
     slideDisplayLeft(displayImage);
     renderImage(displayImage, scrollLag);
-  }    
+  }     
+    
+}
+
+uint8_t getfontIndex(uint8_t chr){
+  uint8_t ret = 0;
+  if(chr >= 'A' && chr <= 'Z'){
+    ret = chr - 'A';
+  }
+  else if(chr >= 'a' && chr <= 'z'){
+    ret = chr - 'a' + 26;    
+  }
+  else if(chr >= '0' && chr <= '9'){
+    ret = chr - '0' + 52;
+  }
+  else{    
+    switch(chr){
+    case '?':
+      ret = 62;
+      break; 
+    case '!':
+      ret = 63;
+      break; 
+    case '@':
+      ret = 64;
+      break; 
+    case '#':
+      ret = 65;
+      break; 
+    case '&':
+      ret = 66;
+      break;       
+    case '(':
+      ret = 67;
+      break; 
+    case ')':
+      ret = 68;
+      break; 
+    case '+':
+      ret = 69;
+      break; 
+    case '-':
+      ret = 70;
+      break; 
+    case '=':
+      ret = 71;
+      break; 
+    case '>':
+      ret = 72;
+      break; 
+    case '<':
+      ret = 73;
+      break; 
+    case '$':
+      ret = 74;
+      break; 
+    case '~':  // substitute for smiley
+      ret = 75;
+      break; 
+    case ' ':
+      ret = 76;
+      break;
+    default:
+      ret = 77;
+      break;     
+    }
+  }
+  return ret;
 }
 
 void getFontImage(uint8_t fontIndex, uint8_t * fontImage){
